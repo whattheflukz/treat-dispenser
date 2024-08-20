@@ -9,9 +9,13 @@ This is a treat dispenser that uses an esp32c6 that is controlled via MQTT, in o
 the folowing environment variables are required to run the application set them in .cargo/config.toml:
 
 SSID="ssid"
+
 PASSWORD="wifi-password"
+
 MQTT_USER="user-name"
+
 MQTT_PASSWORD="password"
+
 MQTT_HOST="192.168.1.x" 
 
 You will need 12 6x3 magnets and 1 9g tower pro servo motor
