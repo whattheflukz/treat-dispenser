@@ -1,0 +1,25 @@
+[target.riscv32imac-unknown-none-elf]
+runner = "espflash flash --monitor"
+
+[env]
+ESP_LOGLEVEL="INFO"
+SSID="ssid"
+PASSWORD="wifi-password"
+EMBASSY_EXECUTOR_TASK_ARENA_SIZE="5120"
+MQTT_USER="user-name"
+MQTT_PASSWORD="password"
+MQTT_HOST="192.168.1.x" 
+
+[build]
+rustflags = [
+  # Required to obtain backtraces (e.g. when using the "esp-backtrace" crate.)
+  # NOTE: May negatively impact performance of produced code
+  "-C", "link-arg=-Tlinkall.x",
+  "-C","force-frame-pointers",
+  "-C", "link-arg=-Trom_functions.x"
+]
+
+target = "riscv32imac-unknown-none-elf"
+
+[unstable]
+build-std = ["core"]
