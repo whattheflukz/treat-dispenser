@@ -2,7 +2,6 @@
 
 # ESP32C6 Treat Dispenser
 
-[![Build Status](
 # Treat Dispenser
 
 This is a treat dispenser that uses an esp32c6 that is controlled via MQTT, in order to dispense a treat increment the integer value of the topic treats/dispense by 1.
