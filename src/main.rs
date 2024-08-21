@@ -73,43 +73,6 @@ const MQTT_PASSWORD: &str = env!("MQTT_PASSWORD");
 const MQTT_HOST: &str = env!("MQTT_HOST");
 const SLEEP_DURATION: u64 = 6_000;
 
-#[derive(Debug, Serialize, Deserialize)]
-struct SubStruct{
-    pub kind: heapless::String<256>,
-    pub etag: heapless::String<256>,
-    #[serde(alias = "pageInfo")]
-    pub page_info: PageInfo,
-    pub items: [Items; 1]
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct PageInfo{
-    #[serde(alias = "totalResults")]
-    pub total_results: u32,
-    #[serde(alias = "resultsPerPage")]
-    pub results_per_page: u32,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Items{
-    pub kind: heapless::String<256>,
-    pub etag: heapless::String<256>,
-    pub id: heapless::String<256>,
-    pub statistics: Statistics
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Statistics{
-    #[serde(alias = "viewCount")]
-    pub view_count: heapless::String<256>,
-    #[serde(alias = "subscriberCount")]
-    pub subscriber_count: heapless::String<256>,
-    #[serde(alias = "hiddenSubscriberCount")]
-    pub hidden_subscriber_count: bool,
-    #[serde(alias = "videoCount")]
-    pub video_count: heapless::String<256>,
-}
-
 // maintains wifi connection, when it disconnects it tries to reconnect
 #[embassy_executor::task]
 async fn connection(mut controller: WifiController<'static>) {
@@ -235,7 +198,7 @@ async fn servo_driver_task(mut servo_pin: GpioPin<0>, mut ledc: Ledc<'static>) {
 }
 
 #[embassy_executor::task]
-async fn post_mqtt_message_task(stack: &'static Stack<WifiDevice<'static, WifiStaDevice>>) {
+async fn get_mqtt_message_task(stack: &'static Stack<WifiDevice<'static, WifiStaDevice>>) {
     const THREAD_INFO: &str = "[POST_MQTT_MESSAGE_TASK]:";
     let mut treat_sub_channel = TREAT_CHANNEL.subscriber().unwrap();
     let mut treat_pub_channel = TREAT_CHANNEL.publisher().unwrap();
@@ -333,7 +296,6 @@ async fn post_mqtt_message_task(stack: &'static Stack<WifiDevice<'static, WifiSt
                     break;
                 },
             };
-            println!("{} Loop Initial Dispensed treats: {}", THREAD_INFO, dispensed_treats);
 
             // if a message was received, update the number of treats to dispense
             if msg.0 != "" {
@@ -428,7 +390,7 @@ async fn main(spawner: Spawner) -> ! {
         Timer::after(Duration::from_millis(500)).await;
     }
 
-    let post_mqtt_res = spawner.spawn(post_mqtt_message_task(&stack)).ok();
+    let post_mqtt_res = spawner.spawn(get_mqtt_message_task(&stack)).ok();
     spawner.spawn(servo_driver_task(servo_pin, ledc)).ok();
     let mut main_loop_iteration: u64 = 0;
 
