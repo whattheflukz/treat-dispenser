@@ -400,7 +400,3 @@ async fn main(spawner: Spawner) -> ! {
         main_loop_iteration += 1;
     }
 }
-
-pub async fn sleep(millis: u32) {
-    Timer::after(Duration::from_millis(millis as u64)).await;
-}
